@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autó Vezérlés</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #1e1e24;
+            color: white;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background: #2a2a35;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            margin: 15px;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            transition: background 0.2s, transform 0.1s;
+        }
+        button:active { transform: scale(0.98); }
+        .btn-taviranyito { background-color: #007bff; }
+        .btn-taviranyito:hover { background-color: #0056b3; }
+        .btn-gepilatas { background-color: #28a745; }
+        .btn-gepilatas:hover { background-color: #218838; }
+        #statusz { margin-top: 25px; font-size: 16px; color: #bbb; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Autó Üzemmód Választó</h2>
+    <button class="btn-taviranyito" onclick="modotValt('1')">Távirányítás (1)</button>
+    <button class="btn-gepilatas" onclick="modotValt('2')">Gépi látás (2)</button>
+    <p id="statusz">Állapot: Várakozás parancsra...</p>
+</div>
+
+<script>
+    function modotValt(modKod) {
+        document.getElementById('statusz').innerText = "Küldés...";
+        
+        // A kérés a Python szerver felé megy
+        fetch('/kuld', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            // A Python a 'uzenet' kulcsot keresi a JSON-ban!
+            body: JSON.stringify({ uzenet: modKod }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('statusz').innerText = "Szerver: " + data.status;
+        })
+        .catch((error) => {
+            console.error('Hiba:', error);
+            document.getElementById('statusz').innerText = "Hiba a küldés során!";
+        });
+    }
+</script>
+
+</body>
+</html>
